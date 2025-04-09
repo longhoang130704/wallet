@@ -76,9 +76,25 @@ public class Paymentcontroller {
         System.out.println("Send notification to user: " + responseMessage);
     }
 
-    @PostMapping("internal-payment")
+    @PostMapping("/internal-payment")
     public String proccessInternalPPayment(@Valid @RequestBody InternalRequest internalRequest) {
+        if (!emailService.verifyOtp(internalRequest.getEmail(),
+                internalRequest.getOtp())) {
+            return "Invalid OTP!";
+        }
+        String internalInfo = internalRequest.toString();
+
+        System.out.println(internalInfo);
+
+        kafkaProducerService.sendMessage("internal-payment-request", internalInfo);
 
         return "Proccess internal payment";
+    }
+
+    @KafkaListener(topics = "internal-payment-response", groupId = "groupA")
+    public void listenInternalPaymentresponse(String responseMessage) {
+        System.out.println("-----------------------");
+        System.out.println(responseMessage);
+        System.out.println("Send notification to user: " + responseMessage);
     }
 }

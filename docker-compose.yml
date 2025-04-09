@@ -1,4 +1,4 @@
-version: '3.8'
+
 services:
   zookeeper:
     image: wurstmeister/zookeeper
@@ -15,8 +15,36 @@ services:
     environment:
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      # KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper
     restart: always
+
+  # wallet:
+  #   build:
+  #     context: ./wallet
+  #     dockerfile: ./Dockerfile
+  #   container_name: wallet
+  #   ports:
+  #     - "8081:8081"
+  #   depends_on:
+  #     - kafka
+  #   environment:
+  #     SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+  # database_service:
+  #   build:
+  #     context: ./databaseService
+  #     dockerfile: ./Dockerfile
+  #   container_name: database_service
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - kafka
+  #   environment:
+  #     SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/wallet_database
+  #     SPRING_DATASOURCE_USERNAME: postgres
+  #     SPRING_DATASOURCE_PASSWORD: 12345678
+  #     SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092

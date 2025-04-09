@@ -14,7 +14,7 @@ public class InternalService {
         this.internalTransactionRepository = internalTransactionRepository;
     }
 
-    public void processInternalTransaction(
+    public Boolean processInternalTransaction(
             Long from_wallet,
             String from_branch,
             Long to_wallet,
@@ -31,8 +31,10 @@ public class InternalService {
                     amount,
                     description,
                     metadata);
+            return true;
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            return false;
         }
 
     }

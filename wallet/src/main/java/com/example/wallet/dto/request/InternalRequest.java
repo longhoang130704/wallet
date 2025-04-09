@@ -30,4 +30,10 @@ public class InternalRequest {
     private String description = "Not valid";
 
     private String metadata;
+
+    @NotNull(message = "Require otp")
+    private int otp;
+
+    @NotNull(message = "Require email")
+    private String email;
 }
