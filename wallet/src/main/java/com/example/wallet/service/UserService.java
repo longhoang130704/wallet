@@ -39,17 +39,20 @@ public class UserService {
             System.out.println("Admin already exists.");
             System.out.println("username: 9999999999");
             System.out.println("password: 9999999999");
+            System.out.println("gmail: admin@gmail.com");
             return existingAdmin.get();
         }
 
         User admin = new User();
         admin.setUsername("9999999999");
         admin.setPassword("9999999999");
+        admin.setEmail("admin@gmail.com");
         admin.setRole("ADMIN");
 
         System.out.println("Admin is created");
         System.out.println("username: 9999999999");
         System.out.println("password: 9999999999");
+        System.out.println("gmail: admin@gmail.com");
 
         return userRepository.save(admin);
     }

@@ -15,8 +15,4 @@ public class KafkaProducerService {
     public void sendMessage(String topic, String message) {
         kafkaTemplate.send(topic, message);
     }
-
-    // public void sendUser(String topic, String sendUser) {
-    // userKafkaTemplate.send(topic, sendUser);
-    // }
 }

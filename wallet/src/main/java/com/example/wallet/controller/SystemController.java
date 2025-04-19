@@ -1,22 +1,16 @@
-// package com.example.wallet.controller;
+package com.example.wallet.controller;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.stereotype.Component;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-// import com.example.wallet.entity.User;
-// import com.example.wallet.service.UserService;
+@RestController
+@RequestMapping
+public class SystemController {
 
-// @Component
-// public class SystemController {
-// private UserService userService;
-
-// @Autowired
-// public SystemController(
-// UserService userService) {
-// this.userService = userService;
-// }
-
-// public Boolean verifyUser(User user) {
-// return true;
-// }
-// }
+    @GetMapping
+    public ResponseEntity<String> sayHello() {
+        return ResponseEntity.ok().body("web is running");
+    }
+}

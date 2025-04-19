@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,11 +14,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.wallet.entity.User;
 import com.example.wallet.service.KafkaProducerService;
 import com.example.wallet.service.UserService;
+import com.example.wallet.util.WalletUtil;
 
 @RestController
 @RequestMapping("/user")
@@ -51,6 +54,25 @@ public class UserController {
         kafkaProducerService.sendMessage("create-user", userToString);
 
         return ResponseEntity.ok(createdUser);
+    }
+
+    @GetMapping("/balance")
+    public ResponseEntity<String> getBalance(@RequestParam String username) {
+        kafkaProducerService.sendMessage("get-balance-request", username);
+
+        return ResponseEntity.ok().body("balance");
+    }
+
+    @KafkaListener(topics = "get-balance-response", groupId = "groupA")
+    public ResponseEntity<String> responseBalance(String message) {
+        System.out.println(message);
+
+        // extract balance
+        Double resultBalance = WalletUtil.extractBalance(message);
+        String result = "balance: " + resultBalance;
+        System.out.println(result);
+
+        return ResponseEntity.ok().body(result);
     }
 
     @GetMapping

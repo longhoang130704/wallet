@@ -8,7 +8,8 @@ WORKDIR /wallet
 COPY target/wallet-0.0.1-SNAPSHOT.jar wallet.jar
 
 # Expose port (nếu app chạy ở 8080)
-EXPOSE 8081
+# EXPOSE 8081
 
 # Lệnh để chạy ứng dụng
-ENTRYPOINT ["java", "-jar", "wallet.jar"]
+# ENTRYPOINT ["java", "-jar", "wallet.jar"]
+ENTRYPOINT ["sh", "-c", "java -jar wallet.jar --server.port=${SERVER_PORT}"]
