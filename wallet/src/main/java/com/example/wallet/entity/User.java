@@ -24,4 +24,6 @@ public class User {
     private String role;
 
     private String email;
+
+    private String devide_id = "";
 }

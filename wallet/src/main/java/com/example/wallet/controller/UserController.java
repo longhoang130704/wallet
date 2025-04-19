@@ -13,14 +13,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.wallet.entity.Device;
 import com.example.wallet.entity.User;
+import com.example.wallet.exception.type.CookieCreatedException;
+import com.example.wallet.service.DeviceService;
 import com.example.wallet.service.KafkaProducerService;
+import com.example.wallet.service.KeyService;
 import com.example.wallet.service.UserService;
+import com.example.wallet.util.CookieUtil;
 import com.example.wallet.util.WalletUtil;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/user")
@@ -28,30 +36,68 @@ public class UserController {
 
     private UserService userService;
     private KafkaProducerService kafkaProducerService;
+    private DeviceService deviceService;
+    private KeyService keyService;
 
     @Autowired
     public UserController(
             UserService userService,
-            KafkaProducerService kafkaProducerService) {
+            KafkaProducerService kafkaProducerService,
+            DeviceService deviceService,
+            KeyService keyService) {
         this.userService = userService;
         this.kafkaProducerService = kafkaProducerService;
+        this.deviceService = deviceService;
+        this.keyService = keyService;
     }
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody User user) {
+    public ResponseEntity<?> createUser(
+            @RequestHeader("User-Agent") String userAgent,
+            HttpServletResponse response,
+            @RequestBody User user) {
+        // check user name is exist
         Optional<User> foundUser = userService.getUserByUsername(user.getUsername());
         if (foundUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username đã tồn tại");
         }
+        // -------------------- Business logic -----------------------------
+        // -------------------- Onboard user --------------------------------
 
+        // tao device information
+        Device deviceInfo = new Device();
+        System.out.println(deviceInfo);
+        // parse user agent to device info
+        deviceInfo = deviceService.info(userAgent);
+
+        // tao unique id voi hashing
+        String userAgentInfo = user.getUsername() + " - " +
+                user.getPassword() + "-" +
+                user.getId();
+        System.out.println("Chuỗi đầu vào tạo token: " + userAgentInfo);
+
+        String hashUniqueUser = keyService.generateToken(userAgentInfo);
+
+        // set devide_id befor create user
+        user.setDevide_id(hashUniqueUser);
+
+        // ghi hash string vao cookie
+        Boolean isSuccess = CookieUtil.createCookie(response, "device_id", hashUniqueUser);
+        if (!isSuccess) {
+            throw new CookieCreatedException("create cookie failed");
+        }
+
+        // ------------------------------------------------------
+        // call user service to save user to database
         User createdUser = userService.createUser(user);
 
         System.out.println(createdUser.toString());
 
         String userToString = createdUser.toString();
+        System.out.println(userToString);
 
         // send by Kafka
-        kafkaProducerService.sendMessage("create-user", userToString);
+        // kafkaProducerService.sendMessage("create-user", userToString);
 
         return ResponseEntity.ok(createdUser);
     }
