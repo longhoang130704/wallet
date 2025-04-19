@@ -41,4 +41,5 @@ public class WalletMapper {
 
         return wallet;
     }
+
 }

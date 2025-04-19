@@ -72,8 +72,8 @@ public class InternalController {
         // -------------------------------------------
         if (!isSuccess) {
             System.out.println("-------------------");
-            System.out.println("Phan hoi lai internal-payment-request");
-            kafkaProducerService.sendResponseMessage("internal-payment-response",
+            System.out.println("Phan hoi lai internal-payment-request-success");
+            kafkaProducerService.sendResponseMessage("internal-payment-response-success",
                     "internal payment response: failed!");
             System.out.println("-------------------");
             return false;
@@ -81,7 +81,7 @@ public class InternalController {
         // ---------------------------------------------
         System.out.println("-------------------");
         System.out.println("Phan hoi lai internal-payment-request");
-        kafkaProducerService.sendResponseMessage("internal-payment-response",
+        kafkaProducerService.sendResponseMessage("internal-payment-response-failed",
                 "internal payment response: success!");
         System.out.println("-------------------");
 

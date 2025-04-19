@@ -74,13 +74,13 @@ public class ExternalController {
 
             System.out.println("-------------------");
 
-            System.out.println("Phan hoi lai external-payment-request");
-            kafkaProducerService.sendResponseMessage("external-payment-response",
+            System.out.println("Phan hoi lai external-payment-request-success");
+            kafkaProducerService.sendResponseMessage("external-payment-response-success",
                     "external payment response: success!");
             System.out.println("-------------------");
         } catch (Exception e) {
             System.err.println(e.getMessage());
-            kafkaProducerService.sendResponseMessage("external-payment-response",
+            kafkaProducerService.sendResponseMessage("external-payment-response-failed",
                     "external payment response: failed!");
         }
         return true;

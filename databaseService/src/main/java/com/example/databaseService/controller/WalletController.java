@@ -17,6 +17,7 @@ import com.example.databaseService.entity.User;
 import com.example.databaseService.entity.Wallet;
 import com.example.databaseService.mapper.UserMapper;
 import com.example.databaseService.mapper.WalletMapper;
+import com.example.databaseService.service.KafkaProducerService;
 import com.example.databaseService.service.WalletService;
 
 import jakarta.validation.Valid;
@@ -25,10 +26,14 @@ import jakarta.validation.Valid;
 @RequestMapping("api/wallet")
 public class WalletController {
     private final WalletService walletService;
+    private KafkaProducerService kafkaProducerService;
 
     @Autowired
-    public WalletController(WalletService walletService, WalletMapper walletMapper) {
+    public WalletController(
+            WalletService walletService,
+            KafkaProducerService kafkaProducerService) {
         this.walletService = walletService;
+        this.kafkaProducerService = kafkaProducerService;
     }
 
     @PostMapping
@@ -67,6 +72,21 @@ public class WalletController {
             System.out.println("create wallet failed");
             return "create wallet failed";
         }
+    }
+
+    @KafkaListener(topics = "get-balance-request", groupId = "groupB")
+    public void listenGetbalanceevent(String message) {
+        // receive request: get balance
+        System.out.println(message);
+        Long username = Long.parseLong(message);
+
+        // get wallet by username
+        Wallet getWalletbyUserName = walletService.getWalletByUserId(username);
+        String result = getWalletbyUserName.toString();
+
+        // response balance
+        kafkaProducerService.sendResponseMessage("get-balance-response", result);
+        return;
     }
 
     @PostMapping("/locked")

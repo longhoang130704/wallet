@@ -9,7 +9,7 @@ public class KafkaConsumerService {
     @Autowired
     private KafkaProducerService kafkaProducerService;
 
-    @KafkaListener(topics = "topic-demo-request", groupId = "groupB")
+    @KafkaListener(id = "topicReponseTest", topics = "topic-demo-request", groupId = "groupB")
     public void consume(String message) {
         System.out.println("Received message: " + message);
         System.out.println("Phan hoi lai la consumer da nhan duoc");
